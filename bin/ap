@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-role="${1:-base.yml}"
+role="${1:-proxy-server.yml}"
 shift
 inventory="${1:-hosts}"
 shift

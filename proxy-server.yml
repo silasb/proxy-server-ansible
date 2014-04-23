@@ -1,0 +1,62 @@
+---
+- hosts: all
+  sudo: yes
+
+  vars:
+    openresty_version: 1.5.11.1
+
+  tasks:
+  - name: Install required packages
+    apt: pkg={{ item }} state=present
+    with_items:
+    - perl 
+    - build-essential
+    - libreadline-dev
+    - libncurses5-dev
+    - libpcre3-dev
+    - libssl-dev
+    - make
+    - git
+    - redis-server
+
+  - name: Test to see if OpenResty tarball already download
+    command: /usr/bin/test -e /tmp/openresty.tar.gz
+    register: openresty_download
+    changed_when: false
+
+  - name: Download the OpenResty tarball
+    get_url: url=http://openresty.org/download/ngx_openresty-{{ openresty_version }}.tar.gz dest=/tmp/openresty.tar.gz mode=0440
+    when: openresty_download.rc != 0
+
+  - name: Extract OpenResty tarball
+    command: chdir=/tmp/ /bin/tar zxf openresty.tar.gz
+    when: openresty_download.rc != 0
+
+  - name: Test to see if OpenResty is installed
+    command: /usr/bin/test -e /usr/local/openresty/nginx/sbin/nginx
+    register: openrestystatus
+    changed_when: false
+
+  - name: Configure OpenResty
+    command: chdir=/tmp/ngx_openresty-{{ openresty_version }} /tmp/ngx_openresty-{{ openresty_version }}/configure --with-luajit
+    when: openrestystatus.rc != 0
+
+  - name: Compile OpenResty
+    command: chdir=/tmp/ngx_openresty-{{ openresty_version }} make -j2
+    when: openrestystatus.rc != 0
+
+  - name: Install OpenResty
+    command: chdir=/tmp/ngx_openresty-{{ openresty_version }} make install
+    when: openrestystatus.rc != 0
+
+  - name: Copy over the init script
+    copy: src=files/openresty-init dest=/etc/init.d/openresty mode=0755
+
+  - name: Copy over the openresty.conf
+    copy: src=files/openresty.conf dest=/usr/local/openresty/nginx/conf/nginx.conf
+
+  - name: Copy over the lua routing script
+    copy: src=files/get_app_server_location.lua dest=/usr/local/openresty/nginx/get_app_server_location.lua
+
+  - name: restart OpenResty
+    service: name=openresty state=restarted
