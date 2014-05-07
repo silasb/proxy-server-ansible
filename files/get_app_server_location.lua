@@ -7,11 +7,10 @@ local server = red:hget("servers", ngx.var.host)
 ngx.log(ngx.INFO, "connecting to server: ", server)
 
 if server == ngx.null then
-        ngx.exit(ngx.HTTP_NOT_FOUND)
+  ngx.exit(ngx.HTTP_NOT_FOUND)
 else
-        ngx.var.app = server
+  ngx.var.app = server
 end
-
 
 -- ngx.print(red:keys("*"))
 -- ngx.print(server)

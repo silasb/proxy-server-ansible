@@ -22,7 +22,7 @@
   - name: Test to see if OpenResty tarball already download
     command: /usr/bin/test -e /tmp/openresty.tar.gz
     register: openresty_download
-    changed_when: false
+    ignore_errors: True
 
   - name: Download the OpenResty tarball
     get_url: url=http://openresty.org/download/ngx_openresty-{{ openresty_version }}.tar.gz dest=/tmp/openresty.tar.gz mode=0440
