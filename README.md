@@ -1,4 +1,4 @@
-roxy-server-ansible
+proxy-server-ansible
 ====================
 
 Proxy server for my home network.
