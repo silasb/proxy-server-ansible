@@ -6,4 +6,4 @@ inventory="${1:-hosts}"
 shift
 args=$@
 
-ansible-playbook "$role" --inventory-file "$inventory" -K
+ansible-playbook "$role" --inventory-file "$inventory" $args
