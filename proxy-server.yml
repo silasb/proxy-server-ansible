@@ -35,7 +35,8 @@
   - name: Test to see if OpenResty is installed
     command: /usr/bin/test -e /usr/local/openresty/nginx/sbin/nginx
     register: openrestystatus
-    changed_when: false
+    changed_when: False
+    ignore_errors: True
 
   - name: Configure OpenResty
     command: chdir=/tmp/ngx_openresty-{{ openresty_version }} /tmp/ngx_openresty-{{ openresty_version }}/configure --with-luajit
